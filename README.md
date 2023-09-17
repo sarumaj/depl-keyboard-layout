@@ -5,7 +5,7 @@ The keyboard layout has been designed to match an alternative keyboard layoung a
 
  - Polish (Germany, no dead keys)
 
-I used Microsoft Keyboard Layout Creator to define this layout for MS Windows.
+I used Microsoft Keyboard Layout Creator (MSKLC) to define this layout for MS Windows.
 
 The layout enables simultanous typing in German and Polish by providing default shortcuts to access special characters from Polish alphabet (e.g. the ogonek characters), while preserving the German QWERTZ keyboard layout.
 
