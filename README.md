@@ -1,1 +1,16 @@
 # depl-keyboard-layout
+
+Shipping a customized keyboard layout for Windows OS as binary installation package in the releases.
+The keyboard layout has been designed to match an alternative keyboard layoung available in Ubuntu Gnome:
+
+ - Polish (Germany, no dead keys)
+
+I used Microsoft Keyboard Layout Creator to define this layout for MS Windows.
+
+Furthermore, I include two self-made fonts based on my personal handwriting style.
+
+## Further reading
+
+[Gnome Keyboard Layouts](https://help.ubuntu.com/stable/ubuntu-help/keyboard-layouts.html.en)
+
+[Custom Keyboard in Linux/X11](https://people.uleth.ca/~daniel.odonnell/Blog/custom-keyboard-in-linuxx11)
