@@ -1,7 +1,7 @@
 # depl-keyboard-layout
 
 Shipping a customized keyboard layout for Windows OS as binary installation package in the [releases](https://github.com/sarumaj/depl-keyboard-layout/releases/latest).
-The keyboard layout has been designed to match an alternative keyboard layoung available in Ubuntu Gnome:
+The keyboard layout has been designed to match an alternative keyboard layout available in Ubuntu Gnome:
 
 - Polish (Germany, no dead keys)
 
