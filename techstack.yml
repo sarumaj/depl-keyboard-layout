@@ -1,0 +1,20 @@
+repo_name: sarumaj/depl-keyboard-layout
+report_id: de55a861764a887ece9234eb6fac75c7
+version: 0.1
+repo_type: Public
+timestamp: '2024-03-07T17:30:41+00:00'
+requested_by: sarumaj
+provider: github
+branch: main
+detected_tools_count: 1
+tools:
+- name: Git
+  description: Fast, scalable, distributed revision control system
+  website_url: http://git-scm.com/
+  open_source: true
+  hosted_saas: false
+  category: Build, Test, Deploy
+  sub_category: Version Control System
+  image_url: https://img.stackshare.io/service/1046/git.png
+  detection_source_url: https://github.com/sarumaj/depl-keyboard-layout
+  detection_source: Repo Metadata
