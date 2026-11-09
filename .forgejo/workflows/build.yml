@@ -1,0 +1,33 @@
+---
+# Builds the layouts from layout/depl.toml and checks that they are xkb's de(pl).
+# The installers need Windows and macOS, which Forgejo's runners are not: the
+# GitHub copy builds them (.github/workflows/release.yml), and its releases come
+# back to Forgejo.
+name: build
+"on":
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: https://github.com/actions/checkout@v7
+      - name: Install Python
+        uses: https://github.com/actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Build the layouts
+        run: |
+          pip install -r requirements.txt
+          python scripts/build.py
+      - name: Check them against xkb's de(pl)
+        run: |
+          sudo=$([ "$(id -u)" -eq 0 ] || echo sudo)
+          $sudo apt-get update -qq
+          $sudo apt-get install -y -qq --no-install-recommends \
+            libxkbcommon-tools xkb-data x11proto-dev
+          python scripts/check.py

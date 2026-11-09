@@ -1,0 +1,145 @@
+---
+# Builds the layouts and the installers, which need Windows and macOS (Forgejo's
+# runners are Linux only), tests the installers on GitHub's runners and, for a
+# tag vX.Y.Z, publishes the release. Forgejo pushes the repository here and copies
+# the release back (HomeLab, forgejo-github-sync).
+name: release
+"on":
+  # Every branch Forgejo pushes here, so a pull request's installers are tested
+  # before it is merged; a tag also publishes.
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  # Run by hand to retry a tag's release, with the tag in the field.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag to release (vX.Y.Z); empty to build only
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+env:
+  TAG: ${{ inputs.tag || (github.ref_type == 'tag' && github.ref_name) || '' }}
+
+jobs:
+  layouts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Build the layouts
+        run: |
+          case "$TAG" in
+            "") version=0.0.0 ;;
+            v[0-9]*.[0-9]*.[0-9]*) version=${TAG#v} ;;
+            *) echo "::error::$TAG is not a release tag (vX.Y.Z)"; exit 1 ;;
+          esac
+          pip install -r requirements.txt
+          python scripts/build.py --version "$version"
+      - name: Check them against xkb's de(pl)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends \
+            libxkbcommon-tools xkb-data x11proto-dev
+          python scripts/check.py
+      - uses: actions/upload-artifact@v7
+        with:
+          name: layouts
+          path: dist/
+
+  windows:
+    needs: layouts
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: layouts
+          path: dist/
+      - name: Build the installer
+        shell: pwsh
+        run: scripts/build-windows.ps1
+      - name: Install, type and uninstall
+        shell: pwsh
+        run: scripts/test-windows.ps1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: windows
+          path: |
+            dist/depl-setup.exe
+            dist/install.log
+          if-no-files-found: ignore
+
+  macos:
+    needs: layouts
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: layouts
+          path: dist/
+      - name: Build the installer
+        run: scripts/build-macos.sh dist
+      - name: Check and install it
+        run: scripts/test-macos.sh dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos
+          path: dist/depl.pkg
+
+  release:
+    if: inputs.tag || github.ref_type == 'tag'
+    needs: [layouts, windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts/
+      - name: Collect the release files
+        run: |
+          v=${TAG#v}
+          mkdir release
+          cp artifacts/windows/depl-setup.exe "release/depl-$v-windows-setup.exe"
+          cp artifacts/layouts/depl.klc "release/depl-$v-windows.klc"
+          cp artifacts/layouts/depl.ahk "release/depl-$v-windows-autohotkey.ahk"
+          cp artifacts/macos/depl.pkg "release/depl-$v-macos.pkg"
+          (cd artifacts/layouts && zip -qr "../../release/depl-$v-macos-bundle.zip" depl.bundle)
+          (cd artifacts/layouts && zip -q "../../release/depl-$v-linux-xkb.zip" depl.xkb_symbols depl.xkb_keymap)
+          cp artifacts/layouts/depl.svg "release/depl-$v.svg"
+          ls -l release
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous=$(git describe --tags --abbrev=0 "$TAG^" 2>/dev/null || true)
+          git log --no-merges --format='- %s' ${previous:+"$previous.."}"$TAG" > notes.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TAG" --notes-file notes.md
+            gh release upload "$TAG" release/* --clobber
+          else
+            gh release create "$TAG" release/* --title "$TAG" --notes-file notes.md --verify-tag
+          fi
