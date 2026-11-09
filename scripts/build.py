@@ -92,10 +92,22 @@ def fix_keylayout(path: pathlib.Path, name: str) -> None:
     outputs (&#x0008; for backspace) are not allowed in XML 1.0. A layout without
     dead keys has no terminators, and Apple's DTD wants none rather than an empty
     element.
+
+    Kalamine types the space bar through actions (for its dead keys), and macOS
+    typed nothing with them. Without dead keys the space bar outputs its character
+    directly, as in Apple's layouts, and no actions are left.
     """
     text = path.read_text(encoding="utf-8")
     text = text.replace('<?xml version="1.0"', '<?xml version="1.1"', 1)
     text = re.sub(r"\n\s*<terminators>\s*</terminators>", "", text)
+    text = re.sub(
+        r'action="spce_x([0-9a-f]{4})"',
+        lambda m: f'output="{chr(int(m[1], 16))}"',
+        text,
+    )
+    if "action=" in text:
+        sys.exit(f"{path}: a key other than the space bar has an action")
+    text = re.sub(r"\n\s*<actions>.*?</actions>", "", text, flags=re.S)
     text, named = re.subn(
         r'<keyboard group="0" id="0" name="[^"]*"',
         f'<keyboard group="0" id="{KEYLAYOUT_ID}" name="{name}"',
