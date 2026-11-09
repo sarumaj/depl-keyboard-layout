@@ -86,6 +86,12 @@ GitHub copy builds and tests the installers on Windows and macOS and, for a tag
 `vX.Y.Z`, publishes the release (`.github/workflows/release.yml`), which comes
 back to Forgejo.
 
+Releases: commits are
+[Conventional Commits](https://www.conventionalcommits.org/) (`.cz.toml`). The
+release bot on Forgejo tags the release they call for and writes its section of
+`CHANGELOG.md`, from the hand-written `## Unreleased` where there is one; the
+tag publishes the release.
+
 ## Fonts
 
 The repository also holds two fonts of my handwriting, `DaveFont-Regular.otf`
