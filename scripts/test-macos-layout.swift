@@ -6,18 +6,32 @@
 import Carbon
 import Foundation
 
-let sourceID = "org.ciepiela.keyboardlayout.depl.depl"
+let layoutName = "Polish (Germany, Mac)"
 let bundle = URL(fileURLWithPath: CommandLine.arguments[1])
 TISRegisterInputSource(bundle as CFURL)
-let filter = [kTISPropertyInputSourceID as String: sourceID] as CFDictionary
+
+// A string property of an input source.
+func stringProperty(_ source: TISInputSource, _ key: CFString) -> String {
+    guard let value = TISGetInputSourceProperty(source, key) else { return "" }
+    return Unmanaged<CFString>.fromOpaque(value).takeUnretainedValue() as String
+}
+
+// The layout is found by its name: macOS makes the input source's ID itself.
+let layouts = [kTISPropertyInputSourceType as String: kTISTypeKeyboardLayout as String]
+let sources =
+    TISCreateInputSourceList(layouts as CFDictionary, true)?.takeRetainedValue()
+    as? [TISInputSource] ?? []
 guard
-    let sources = TISCreateInputSourceList(filter, true)?.takeRetainedValue() as? [TISInputSource],
-    let source = sources.first,
+    let source = sources.first(where: { stringProperty($0, kTISPropertyLocalizedName) == layoutName }),
     let property = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
 else {
-    print("macOS has no input source \(sourceID) from \(bundle.path)")
+    print("macOS has no keyboard layout \(layoutName) from \(bundle.path); it has:")
+    for source in sources where !stringProperty(source, kTISPropertyInputSourceID).hasPrefix("com.apple.") {
+        print("  \(stringProperty(source, kTISPropertyInputSourceID)): \(stringProperty(source, kTISPropertyLocalizedName))")
+    }
     exit(1)
 }
+print("Input source \(stringProperty(source, kTISPropertyInputSourceID))")
 let layoutData = Unmanaged<CFData>.fromOpaque(property).takeUnretainedValue() as Data
 
 let none: UInt32 = 0
