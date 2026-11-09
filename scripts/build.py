@@ -89,10 +89,13 @@ def fix_keylayout(path: pathlib.Path, name: str) -> None:
     Shift on 10; Apple's ISO keyboards send them the other way round, as Apple's
     German layout has them (https://github.com/OneDeadKey/kalamine/issues/210).
     The file is declared XML 1.1, as Apple's layouts are: its control keys'
-    outputs (&#x0008; for backspace) are not allowed in XML 1.0.
+    outputs (&#x0008; for backspace) are not allowed in XML 1.0. A layout without
+    dead keys has no terminators, and Apple's DTD wants none rather than an empty
+    element.
     """
     text = path.read_text(encoding="utf-8")
     text = text.replace('<?xml version="1.0"', '<?xml version="1.1"', 1)
+    text = re.sub(r"\n\s*<terminators>\s*</terminators>", "", text)
     text, named = re.subn(
         r'<keyboard group="0" id="0" name="[^"]*"',
         f'<keyboard group="0" id="{KEYLAYOUT_ID}" name="{name}"',
