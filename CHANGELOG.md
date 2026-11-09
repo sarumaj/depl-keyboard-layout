@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 - 2026-11-09
+
 The layout is built from one recipe (`layout/depl.toml`) for Windows, macOS and
 Linux, and the release has installers for Windows and macOS.
 
@@ -19,3 +21,4 @@ Linux, and the release has installers for Windows and macOS.
 
 - BREAKING: the MSKLC layout `Layout02` of 1.0.0. The new Windows layout is
   `depl.dll`, a layout of its own: uninstall `Layout02` in Windows' _Apps_ first.
+
