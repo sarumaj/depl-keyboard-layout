@@ -1,0 +1,42 @@
+# The layout, the one source of every platform's driver: Kalamine
+# (https://github.com/OneDeadKey/kalamine) builds the Windows .klc, the macOS
+# .keylayout and the xkb files from it (scripts/build.py).
+#
+# It is xkb's "Polish (Germany, no dead keys)", de(pl), as Ubuntu ships it: German
+# without dead keys, with ą ć ę ł ń ó ś ź ż on AltGr (macOS: Option) and the
+# letter, the capitals with Shift too. AltGr+E is ę, so € is on AltGr+4.
+#
+# Each key of the drawing shows four characters: Shift and AltGr+Shift on the
+# upper line, the key alone and AltGr on the lower one. A letter's own key is
+# left blank: it is the lower case of the Shift character.
+
+name        = "Polish (Germany, no dead keys)"
+name8       = "depl"
+locale      = "de-DE"
+variant     = "depl"
+author      = "Dawid Ciepiela"
+description = "German QWERTZ with the Polish letters on AltGr, as xkb's de(pl)"
+url         = "https://git.ciepiela.org/dawid/depl-keyboard-layout"
+license     = "GPL-3.0"
+# The release's tag replaces it (scripts/build.py --version).
+version     = "0.0.0"
+geometry    = "ISO"
+
+full = '''
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┲━━━━━━━━━━┓
+│ ° ¬ │ ! ¡ │ " ⅛ │ § £ │ $ ¤ │ % ⅜ │ & ⅝ │ / ⅞ │ ( ™ │ ) ± │ = ° │ ? ¿ │ ` ¸ ┃          ┃
+│ ^ ¬ │ 1 ¹ │ 2 ² │ 3 ³ │ 4 € │ 5 ½ │ 6 ¬ │ 7 { │ 8 [ │ 9 ] │ 0 } │ ß \ │ ´ ¸ ┃ ⌫        ┃
+┢━━━━━┷━━┱──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┺━━┳━━━━━━━┫
+┃        ┃ Q Ω │ W § │ E Ę │ R ® │ T Ŧ │ Z Ż │ U ↑ │ I ı │ O Ó │ P Þ │ Ü ¨ │ * ¯ ┃       ┃
+┃ ↹      ┃   @ │   ſ │   ę │   ¶ │   ŧ │   ż │   ↓ │   → │   ó │   þ │   ¨ │ + ~ ┃       ┃
+┣━━━━━━━━┻┱────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┴┬────┺┓  ⏎   ┃
+┃         ┃ A Ą │ S Ś │ D Ð │ F ª │ G Ŋ │ H Ħ │ J Ʒ │ K & │ L Ł │ Ö ˝ │ Ä ^ │ ' ` ┃      ┃
+┃ ⇬       ┃   ą │   ś │   ð │   đ │   ŋ │   ħ │   ʒ │   ĸ │   ł │   ˝ │   ^ │ # ’ ┃      ┃
+┣━━━━━━┳━━┹──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┬──┴──┲━━┷━━━━━┻━━━━━━┫
+┃      ┃ > † │ Y › │ X Ź │ C Ć │ V ‚ │ B ‘ │ N Ń │ M º │ ; × │ : ÷ │ _ — ┃               ┃
+┃ ⇧    ┃ < | │   » │   ź │   ć │   „ │   “ │   ń │   µ │ , · │ . … │ - – ┃ ⇧             ┃
+┣━━━━━━┻┳━━━━┷━━┳━━┷━━━━┱┴─────┴─────┴─────┴─────┴─────┴─┲━━━┷━━━┳━┷━━━━━╋━━━━━━━┳━━━━━━━┫
+┃       ┃       ┃       ┃                                ┃       ┃       ┃       ┃       ┃
+┃ Ctrl  ┃ super ┃ Alt   ┃ ␣                              ┃ AltGr ┃ super ┃ menu  ┃ Ctrl  ┃
+┗━━━━━━━┻━━━━━━━┻━━━━━━━┹────────────────────────────────┺━━━━━━━┻━━━━━━━┻━━━━━━━┻━━━━━━━┛
+'''
