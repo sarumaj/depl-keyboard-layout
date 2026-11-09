@@ -18,12 +18,13 @@ Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+// Unicode: the default marshals strings as ANSI, which cuts ł (U+0142) to B.
 public static class Keyboard {
-    [DllImport("user32.dll")] static extern IntPtr LoadKeyboardLayout(string id, uint flags);
-    [DllImport("user32.dll")] static extern bool UnloadKeyboardLayout(IntPtr hkl);
-    [DllImport("user32.dll")] static extern int ToUnicodeEx(uint vk, uint scan, byte[] state,
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr LoadKeyboardLayout(string id, uint flags);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern bool UnloadKeyboardLayout(IntPtr hkl);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern int ToUnicodeEx(uint vk, uint scan, byte[] state,
         StringBuilder buf, int size, uint flags, IntPtr hkl);
-    [DllImport("user32.dll")] static extern uint MapVirtualKeyEx(uint code, uint type, IntPtr hkl);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern uint MapVirtualKeyEx(uint code, uint type, IntPtr hkl);
     // What the key of this scan code types with Shift and AltGr (Ctrl+Alt) as given.
     public static string Type(string klid, uint scan, bool shift, bool altGr) {
         IntPtr hkl = LoadKeyboardLayout(klid, 0);
