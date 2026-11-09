@@ -51,10 +51,10 @@ def levels(keymap: str, chars: dict[str, str]) -> dict[str, list[str]]:
     symbols = keymap[keymap.index("xkb_symbols") :]
     result = {}
     for name, body in re.findall(r"key <(\w+)>\s*\{(.*?)\};", symbols, re.S):
-        # xkbcli writes symbols[Group1]= [...] for a key with a type, [...] alone otherwise.
-        group = re.search(r"symbols\[Group1\]\s*=\s*\[([^\]]*)\]", body) or re.search(
-            r"\[([^\]]*)\]", body
-        )
+        # The first group's symbols: [...] alone, or symbols[Group1]= [...] for a key
+        # with a type (symbols[1]= [...] from xkbcommon 1.8 on). A bracket right after
+        # a name is such an index, not a list of symbols.
+        group = re.search(r"(?<!\w)\[([^\]]*)\]", body)
         if not group:
             continue
         syms = [s.strip() for s in group[1].split(",")][:4]
